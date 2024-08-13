@@ -1,5 +1,6 @@
 import Listing from './components/listing';
-import items from './data/etsy.json'
+import items from '../data/etsy.json';
+import './App.css'
 
 function App() {
     return (
