@@ -1,65 +1,56 @@
-interface Props {
-    listing_id: number,
-    url: string,
-    MainImage: string,
-    title: string,
-    currency_code: string,
-    price: string,
-    quantity: number
-} []
-
-function titleCutter(title:string): string {
-    if (title && title.length > 50) {
-        title.slice(50, title.length-1);
-        return `${title}...`;
-    }
-    return title;
+interface Item {
+    listing_id: string | number;
+    state: string;
+    title: string;
+    currency_code: string;
+    price: string;
+    quantity: number;
+    url: string;
+    MainImage: {
+      url_570xN: string;
+    };
+}
+  
+interface ItemProps {
+    item: Item;
 }
 
-function fixPrice (namePrice: string, price: string): string {
-    switch (namePrice) {
-        case 'USD': 
-            return `$${price}`;
-        case 'EUR':
-            return `€${price}`;
-        default: 
-            return `${price} GBP`
-    }
+function fixPrice(currency: string, price: string):string {
+  if (currency === 'USD') return '$' + price;
+  if (currency === 'EUR') return '€' + price;
+  return price + ' GBP';
 }
 
-function balance ( quantity: number) {
-    if (quantity > 20) {
-        return "high"
-    }
-    if (quantity > 10) {
-        return "medium"
-    } 
-    return "low"
+function titleCutter(title: string): string {
+  if (title.length > 50) {
+    return title.slice(0, 49) + '...';
+  }
+  return title || "Нет заголовка";
 }
 
-const Item = ( data: Props ) => {
-    const {items} = data;
-
-    return (
-        <>
-        {items.map((el : Props)=> {
-             return (
-                <div key={el.listing_id} className="item">
-                    <div className="item-image">
-                        <a href={el.url}> 
-                            <img src={el.MainImage}/>
-                        </a>
-                    </div>
-                    <div className="item-details">
-                        <p className="item-title">{titleCutter(el.title || "")}</p>
-                        <p className="item-price">{fixPrice(el.currency_code, el.price)}</p>
-                        <p className={`item-quantity level-${balance(el.quantity)}`}>{el.quantity}</p>
-                    </div>
-                </div>
-                )
-        })}
-        </>
-    )
+function level(quantity: number) {
+  if (quantity <= 10) return 'low';
+  if (quantity <= 20) return 'medium';
+  return 'high';
 }
 
-export default Item
+export default function Item({ item }: ItemProps) {
+  return (
+    <div className="item">
+      <div className="item-image">
+        <a href={item.url}>
+          <img src={item.MainImage.url_570xN} alt={item.title} />
+        </a>
+      </div>
+      <div className="item-details">
+        <p className="item-title">{titleCutter(item.title)}</p>
+        <p className="item-price">
+          {fixPrice(item.currency_code, item.price)}
+        </p>
+        <p className={`item-quantity level-${level(item.quantity)}`}>
+          {item.quantity} left
+        </p>
+      </div>
+    </div>
+  );
+}
