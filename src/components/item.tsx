@@ -1,19 +1,18 @@
-interface Item {
-    listing_id: string | number;
-    state: string;
-    title: string;
-    currency_code: string;
-    price: string;
-    quantity: number;
-    url: string;
-    MainImage: {
+interface Items {
+    listing_id: number;
+    title?: string;
+    currency_code?: string;
+    price?: string;
+    quantity?: number;
+    url?: string;
+    MainImage?: {
       url_570xN: string;
     };
-}
+  }
   
-interface ItemProps {
-    item: Item;
-}
+// interface ItemProps {
+//     item: Items;
+// }
 
 function fixPrice(currency: string, price: string):string {
   if (currency === 'USD') return '$' + price;
@@ -28,27 +27,31 @@ function titleCutter(title: string): string {
   return title || "Нет заголовка";
 }
 
-function level(quantity: number) {
+function level(quantity: number):string {
   if (quantity <= 10) return 'low';
   if (quantity <= 20) return 'medium';
   return 'high';
 }
 
-export default function Item({ item }: ItemProps) {
+export default function Item( {listing_id, url, MainImage, title, currency_code, price, quantity}: Items) {
   return (
-    <div className="item">
+    <div className="item" key={listing_id}>
       <div className="item-image">
-        <a href={item.url}>
-          <img src={item.MainImage.url_570xN} alt={item.title} />
+        <a href={url}>
+        {MainImage && MainImage.url_570xN ? (
+                  <img src={MainImage.url_570xN} alt={title} />
+                ) : (
+                  <></>
+                )}
         </a>
       </div>
       <div className="item-details">
-        <p className="item-title">{titleCutter(item.title)}</p>
+        <p className="item-title">{titleCutter(title || '')}</p>
         <p className="item-price">
-          {fixPrice(item.currency_code, item.price)}
+          {fixPrice(currency_code || '', price || '0')}
         </p>
-        <p className={`item-quantity level-${level(item.quantity)}`}>
-          {item.quantity} left
+        <p className={`item-quantity level-${level(quantity || 0)}`}>
+          {quantity || 0} left
         </p>
       </div>
     </div>
